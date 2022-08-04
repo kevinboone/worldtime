@@ -13,7 +13,7 @@ usual Linux timezone database) you could be more particular:
 
     worldtime 1:23 Europe/Paris 
 
-Note that the reqion name _can't_ be a timzone, like "IST". The script
+Note that the region name _can't_ be a timezone, like "IST". The script
 make no provision for this kind of operation, because these timezone
 names are ambiguous.
 
