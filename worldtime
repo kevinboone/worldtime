@@ -1,0 +1,95 @@
+#!/bin/bash
+# worldtime
+# 
+# A simple Linux script to display times around the world, at some 
+#  specified time in some location.
+# 
+# Usage: worldtime {time} [timezone region]
+# Examples:
+#
+# worldtime
+# show current time around the world
+# 
+# worldtime 13:40 paris
+# show time around the world when it's 13:40 in Paris
+#
+# You can use a full TZ region name like "Europe/Paris"; otherwise
+#  the program will look up the argument string in the timezone table.
+#
+# Copyright (c)2022 Kevin Boone. Distributed under the terms of the 
+#   GNU Public Licence, v3.0
+
+# Give helpful names to the input arguments
+IN_TIME=$1
+IN_TZ=$2
+
+# If there's no time, use "now", which is understood by 'date'
+if [ -z "$IN_TIME" ] ; then
+  IN_TIME=now
+fi
+
+# If there's no timezone, get the default local timezone region using
+#   timedatectl. Note that the 'date' command, as used later,
+#   requires a region and _not_ a timezone specification like 'BST'.
+if [ -z "$IN_TZ" ] ; then
+  #LOCAL_TZ=`date +%Z` # This won't work
+  # Use awk to extrace the timezone from the output of timedatectl
+  LOCAL_TZ=`timedatectl |grep zone|awk '{print $3}'`
+  IN_TZ=$LOCAL_TZ
+fi
+
+# If the input region does not contain a "/", then look it up
+#  in the timezone table
+if [[ "$IN_TZ" != */* ]]; then
+  IN_TZ=`timedatectl list-timezones | grep -i -m 1 $IN_TZ`
+  if [ -z "$IN_TZ" ] ; then
+    echo 'No matching timezone. Try "timedatectrl list-timezones".'
+    exit
+  fi 
+  # If we get a timezone region by doing a lookup, print the actual
+  #   region, because there may be an unexpected match
+  echo Note: using timzone $IN_TZ
+fi;
+
+# This is the format argument to 'date' -- hour, minute, timezone
+FORMAT="%H:%M %Z"
+
+# Ouptut the various times. The basic format of this command is
+#  TZ={output region} date --date "TZ="{input region}" time" +formatn
+# Note that the --date argument is a single string, and it contains
+#  both spaces and double quotes. Hence the fiddly escaping in the
+#  command that follow.
+# Of course, the list of cities displayed can easily be customized
+#  as required.
+
+echo -n "Chicago:     "
+TZ=America/Chicago date --date TZ="\"$IN_TZ\" $IN_TIME" "+$FORMAT"
+
+# Note -- India has only one timezone
+echo -n "India:       "
+TZ=Asia/Kolkata date --date TZ="\"$IN_TZ\" $IN_TIME" "+$FORMAT"
+
+echo -n "Jerusalem:   "
+TZ=Asia/Jerusalem date --date TZ="\"$IN_TZ\" $IN_TIME" "+$FORMAT"
+
+echo -n "London:      "
+TZ=Europe/London date --date TZ="\"$IN_TZ\" $IN_TIME" "+$FORMAT"
+
+echo -n "Paris:       "
+TZ=Europe/Paris date --date TZ="\"$IN_TZ\" $IN_TIME" "+$FORMAT"
+
+echo -n "Los Angeles: "
+TZ=America/Los_Angeles date --date TZ="\"$IN_TZ\" $IN_TIME" "+$FORMAT"
+
+echo -n "New York:    "
+TZ=America/New_York date --date TZ="\"$IN_TZ\" $IN_TIME" "+$FORMAT"
+
+echo -n "Singapore:   "
+TZ=Asia/Singapore date --date TZ="\"$IN_TZ\" $IN_TIME" "+$FORMAT"
+
+echo -n "Sydney:      "
+TZ=Australia/Sydney date --date TZ="\"$IN_TZ\" $IN_TIME" "+$FORMAT"
+
+
+
+
