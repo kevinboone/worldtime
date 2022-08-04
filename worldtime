@@ -55,41 +55,30 @@ fi;
 FORMAT="%H:%M %Z"
 
 # Ouptut the various times. The basic format of this command is
-#  TZ={output region} date --date "TZ="{input region}" time" +formatn
+#   TZ={output region} date --date "TZ="{input region}" time" +formatn
 # Note that the --date argument is a single string, and it contains
-#  both spaces and double quotes. Hence the fiddly escaping in the
-#  command that follow.
+#   both spaces and double quotes. Hence the fiddly escaping in the
+#   command that follow.
 # Of course, the list of cities displayed can easily be customized
-#  as required.
+#   as required.
 
-echo -n "Chicago:     "
-TZ=America/Chicago date --date TZ="\"$IN_TZ\" $IN_TIME" "+$FORMAT"
-
+# The REGIONS array contains the string displayed, followed by
+#   the timezone region.
+REGIONS=("Chicago:     " "America/Chicago" 
 # Note -- India has only one timezone
-echo -n "India:       "
-TZ=Asia/Kolkata date --date TZ="\"$IN_TZ\" $IN_TIME" "+$FORMAT"
+         "India:       " "Asia/Kolkata"
+         "Jerusalem:   " "Asia/Jerusalem"
+         "London:      " "Europe/London"
+         "Paris:       " "Europe/Paris"
+         "Los Angeles: " "America/Los_Angeles"
+         "New York:    " "America/New_York"
+         "Singapore:   " "Asia/Singapore"
+         "Sydney:      " "Australia/Sydney")
 
-echo -n "Jerusalem:   "
-TZ=Asia/Jerusalem date --date TZ="\"$IN_TZ\" $IN_TIME" "+$FORMAT"
-
-echo -n "London:      "
-TZ=Europe/London date --date TZ="\"$IN_TZ\" $IN_TIME" "+$FORMAT"
-
-echo -n "Paris:       "
-TZ=Europe/Paris date --date TZ="\"$IN_TZ\" $IN_TIME" "+$FORMAT"
-
-echo -n "Los Angeles: "
-TZ=America/Los_Angeles date --date TZ="\"$IN_TZ\" $IN_TIME" "+$FORMAT"
-
-echo -n "New York:    "
-TZ=America/New_York date --date TZ="\"$IN_TZ\" $IN_TIME" "+$FORMAT"
-
-echo -n "Singapore:   "
-TZ=Asia/Singapore date --date TZ="\"$IN_TZ\" $IN_TIME" "+$FORMAT"
-
-echo -n "Sydney:      "
-TZ=Australia/Sydney date --date TZ="\"$IN_TZ\" $IN_TIME" "+$FORMAT"
-
-
-
+# Loop around the array of names and timezones, printing the time in
+#   each one.
+for (( i = 0; i < ${#REGIONS[@]}; i+=2 )); do
+  echo -n "${REGIONS[$i]}" 
+  TZ=${REGIONS[$i + 1]} date --date TZ="\"$IN_TZ\" $IN_TIME" "+$FORMAT"
+done
 
